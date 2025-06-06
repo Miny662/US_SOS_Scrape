@@ -49,6 +49,14 @@ docker push 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-dr
 └── README.md                 # Project documentation
 ```
 
+## Run:
+
+https://lllbbjusgrxgexkpc3jkiz3cpi0holya.lambda-url.us-east-1.on.aws/?id=<id>
+
+Example:
+
+https://lllbbjusgrxgexkpc3jkiz3cpi0holya.lambda-url.us-east-1.on.aws/?id=2649096
+
 ## Output:
 
 The scraper returns a JSON file containing company data that matches the entered search parameters.
