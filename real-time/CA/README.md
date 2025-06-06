@@ -36,16 +36,18 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 docker tag palm-selenium-chrome-driver:latest 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-driver:latest
 docker push 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-driver:latest
 
-🏗️ Project Structure
+## 🏗️ Project Structure
 
-
-├── Dockerfile # Docker configuration (Selenium + Chrome + Python dependencies)\n
-├── chrome-installer.sh # Script to install Chrome/Chromedriver in Lambda environment\n
-├── main.py # Lambda handler (entry point for AWS Lambda)
-├── scraper.py # Core parser logic and data extraction
-├── process_request.py # Handles initial HTTP requests (uses requests library)
-├── process_selenium.py # Manages anti-scraping pages (uses Selenium WebDriver)
-└── README.md # Project documentation
+```text
+.
+├── Dockerfile                # Docker configuration (Selenium + Chrome + Python dependencies)
+├── chrome-installer.sh       # Script to install Chrome/Chromedriver in Lambda environment
+├── main.py                   # Lambda handler (entry point for AWS Lambda)
+├── scraper.py                # Core parser logic and data extraction
+├── process_request.py        # Handles initial HTTP requests (uses `requests` library)
+├── process_selenium.py       # Manages anti-scraping pages (uses Selenium WebDriver)
+└── README.md                 # Project documentation
+```
 
 ## Output:
 
