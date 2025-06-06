@@ -51,11 +51,17 @@ docker push 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-dr
 
 ## Run:
 
+```
 https://lllbbjusgrxgexkpc3jkiz3cpi0holya.lambda-url.us-east-1.on.aws/?id=<id>
+
+```
 
 Example:
 
+```
 https://lllbbjusgrxgexkpc3jkiz3cpi0holya.lambda-url.us-east-1.on.aws/?id=2649096
+
+```
 
 ## Output:
 
