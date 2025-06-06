@@ -37,8 +37,8 @@ docker tag palm-selenium-chrome-driver:latest 430118818332.dkr.ecr.us-east-1.ama
 docker push 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-driver:latest
 
 🏗️ Project Structure
-text
-.
+
+
 ├── Dockerfile                # Docker config (Selenium + Chrome)
 ├── main.py                   # Lambda handler
 ├── scraper.py                # parser logic
