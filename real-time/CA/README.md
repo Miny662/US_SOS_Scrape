@@ -39,8 +39,8 @@ docker push 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-dr
 🏗️ Project Structure
 
 
-├── Dockerfile # Docker configuration (Selenium + Chrome + Python dependencies)
-├── chrome-installer.sh # Script to install Chrome/Chromedriver in Lambda environment
+├── Dockerfile # Docker configuration (Selenium + Chrome + Python dependencies)\n
+├── chrome-installer.sh # Script to install Chrome/Chromedriver in Lambda environment\n
 ├── main.py # Lambda handler (entry point for AWS Lambda)
 ├── scraper.py # Core parser logic and data extraction
 ├── process_request.py # Handles initial HTTP requests (uses requests library)
