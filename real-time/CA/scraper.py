@@ -46,6 +46,12 @@ class Scraper:
     def normalize_name(self, item):
         item = re.sub(r'\([^)]*\)|^\"', '', item)
         return item.strip()
+    
+    def get_record_num(self, item):
+        match = re.search(r'\((.*?)\)', item)
+        if match:
+            return match.group(1)
+        return None
 
     def parser_item_details(self, id, name):
         items = {}
@@ -76,13 +82,16 @@ class Scraper:
             row_dict = rows[row] 
             id = row_dict.get("ID")
             print(id, "***")
-            record_num = row_dict.get("RECORD_NUM")
-            print(record_num, "###", self.id)
-            if record_num and record_num==self.id:   
-                try:
-                    name = self.normalize_name(row_dict.get("TITLE", [])[0])
-                except:
-                    name = ""
+            print(row_dict, "***")
+            record_num = None
+            try:
+                orginal_name = row_dict.get("TITLE", [])[0]
+                record_num = self.get_record_num(orginal_name)
+                name = self.normalize_name(orginal_name)
+            except:
+                name = ""
+            if record_num and self.id == record_num:
+                print("DAMPAAAAAAAAAAAAA")
                 items = self.parser_item_details(id, name)
                 print(items, "+++")
                 return items
@@ -121,7 +130,8 @@ class Scraper:
             if response:
                 try:
                     items = self.parser_items(response)
-                except:
+                except Exception as e:
+                    print("Error: {}".format(e))
                     result = {"success": False,
                               "message": "Parser error...!!!" 
                         }
