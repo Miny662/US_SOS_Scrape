@@ -1,4 +1,4 @@
-### Scraper historical data palm-historical-data-ny:
+## Scraper historical data palm-historical-data-ny:
 
 Historical Information Tracker for Searching for New York Secretary of State Businesses (SOS NY)
 
