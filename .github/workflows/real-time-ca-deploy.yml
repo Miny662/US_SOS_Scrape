@@ -34,7 +34,7 @@ jobs:
           context: ./real-time/CA
           file: ./real-time/CA/Dockerfile
           push: true
-          tags: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_PDP_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_PDP_REPO_NAME }}
