@@ -36,6 +36,11 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 docker tag palm-selenium-chrome-driver:latest 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-driver:latest
 docker push 430118818332.dkr.ecr.us-east-1.amazonaws.com/palm-selenium-chrome-driver:latest
 
+# Deployment
+Currently, this is just the case for the real-time CA code, but the others are coming soon.
+
+When a branch is merged into `main`, the `Real-Time CA Deploy` GitHub Action builds the Docker image, pushes it to ECR, and updates the CA real-time lambda.
+
 ## 🏗️ Project Structure
 
 ```text
