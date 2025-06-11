@@ -29,6 +29,9 @@ jobs:
         run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
       - name: Build, tag, and push the image to Amazon ECR
         id: build-image
+        with:
+          context: ./real-time/CA
+          file: ./real-time/CA/Dockerfile
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ secrets.ECR_PDP_REPO_NAME }}
