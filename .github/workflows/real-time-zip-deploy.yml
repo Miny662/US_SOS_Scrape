@@ -30,4 +30,5 @@ jobs:
           cd real-time/AL
           pwd
           ls -al
-          zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}
+          zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
+          ls -al
