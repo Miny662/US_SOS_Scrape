@@ -2,7 +2,7 @@ name: Real-Time .zip Deploy
 on:
   push:
     branches:
-      - PAL-2219_deploy_pipeline_zip_scrapers
+      - main
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
@@ -26,8 +26,8 @@ jobs:
       - name: Get timestamp
         id: get-timestamp
         run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
-      - name: Create zip
-        id: create-zip
+      - name: Create zip and deploy
+        id: create-zip-and-deploy
         run: |
           cd real-time/AL
           pwd
