@@ -34,22 +34,5 @@ jobs:
           ls -al
           zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
           ls -al
-#          aws s3 cp real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip s3://palm-data-pipeline/lib/scrapers/real-time/al/real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
           echo "zip_name=real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip" >> "$GITHUB_OUTPUT"
           aws lambda update-function-code --function-name palm-realtime-sos-al --zip-file ./real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
-#  update_lambda:
-#    needs: zip_and_deploy
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Assume AWS IAM Role
-#        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
-#        with:
-#          role-to-assume: ${{ secrets.CI_CD_IAM_ROLE }}
-#          aws-region: us-east-1
-#      - name: Update lambda source
-#        env:
-#          ZIP_NAME: ${{needs.zip_and_deploy.outputs.zip_name}}
-#        id: update_lambda_source
-#        run: |
-#          echo $ZIP_NAME
-#          aws lambda update-function-code --function-name palm-realtime-sos-al --s3-bucket palm-data-pipeline --s3-key lib/scrapers/real-time/al/$ZIP_NAME
