@@ -34,5 +34,4 @@ jobs:
           ls -al
           zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
           ls -al
-#          echo "zip_name=real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip" >> "$GITHUB_OUTPUT"
           aws lambda update-function-code --function-name palm-realtime-sos-al --zip-file fileb://home/runner/work/sos-scraper/sos-scraper/real-time/AL/real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
