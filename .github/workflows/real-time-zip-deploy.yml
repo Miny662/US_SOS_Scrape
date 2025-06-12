@@ -51,4 +51,4 @@ jobs:
         id: update_lambda_source
         run: |
           echo $ZIP_NAME
-          aws lambda update-function-code --function-name palm-realtime-sos-al --s3-bucket s3://palm-data-pipeline/lib/scrapers/real-time/al/$ZIP_NAME
+          aws lambda update-function-code --function-name palm-realtime-sos-al --s3-bucket s3://palm-data-pipeline --s3-key lib/scrapers/real-time/al/$ZIP_NAME
