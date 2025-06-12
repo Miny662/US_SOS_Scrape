@@ -32,3 +32,4 @@ jobs:
           ls -al
           zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
           ls -al
+          aws s3 cp real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip s3://palm-data-pipeline/lib/scrapers/real-time/al/real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
