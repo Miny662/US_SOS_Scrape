@@ -45,8 +45,10 @@ jobs:
         with:
           role-to-assume: ${{ secrets.CI_CD_IAM_ROLE }}
           aws-region: us-east-1
-      - name: Update CA lambda image
+      - name: Update lambda source
         env:
           ZIP_NAME: ${{needs.zip_and_deploy.outputs.zip_name}}
-        id: ca-image-update
-        run: echo $ZIP_NAME
+        id: update_lambda_source
+        run: |
+          echo $ZIP_NAME
+          aws lambda update-function-code --function-name palm-realtime-sos-al --s3-bucket s3://palm-data-pipeline/lib/scrapers/real-time/al/$ZIP_NAME
