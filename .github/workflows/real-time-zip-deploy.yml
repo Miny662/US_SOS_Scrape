@@ -17,6 +17,7 @@ jobs:
       - name: Get Lambdas
         id: get-lambdas
         run: |
+          tree -d -L 1 -J
           lambdas=$(tree -d -L 1 -J | jq -j -c '.[0].contents | map(.name)')
           echo ::set-output name=lambdas::${lambdas}
   zip_and_deploy:
