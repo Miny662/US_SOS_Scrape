@@ -17,6 +17,7 @@ jobs:
       - name: Get Lambdas
         id: get-lambdas
         run: |
+          cd real-time
           tree -d -L 1 -J
           lambdas=$(tree -d -L 1 -J | jq -j -c '.[0].contents | map(.name)')
           echo ::set-output name=lambdas::${lambdas}
@@ -25,7 +26,7 @@ jobs:
     needs: autodiscover
     strategy:
       matrix:
-        lambda: ${{ fromJSON(needs.get-filenames.outputs.lambda_array) }}
+        lambda: ${{ fromJSON(needs.autodiscover.outputs.lambda_array) }}
     runs-on: ubuntu-latest
     outputs:
       zip_name: ${{ steps.create-zip.outputs.zip_name }}
