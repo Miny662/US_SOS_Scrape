@@ -49,6 +49,7 @@ jobs:
         if: ${{ hashFiles('real-time/${{matrix.lambda}}/Dockerfile') == '' }}
         run: |
           cd real-time/${{matrix.lambda}}
+          echo ${{ github.workspace }}
           echo ${{ hashFiles('real-time/${{matrix.lambda}}/Dockerfile') }}
           echo ${{matrix.lambda}}
           pwd
