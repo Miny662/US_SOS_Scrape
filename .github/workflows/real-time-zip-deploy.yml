@@ -46,15 +46,13 @@ jobs:
         run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
       - name: Create package and deploy
         id: create-package-and-deploy
-        if: ${{ hashFiles('real-time/${{matrix.lambda}}/Dockerfile') == '' }}
         run: |
           cd real-time/${{matrix.lambda}}
           if ls -al | grep Dockerfile; then
             ls -al
             echo "DOCKERFILE"
-            echo ${{matrix.lambda@L}}
+            echo ${{matrix.lambda}}
           else
             echo ${{matrix.lambda}}
-            echo ${{matrix.lambda@L}}
-            zip -r real_time_${{matrix.lambda@L}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
+            zip -r real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
           fi
