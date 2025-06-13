@@ -48,7 +48,7 @@ jobs:
         id: get-timestamp
         run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
       - name: Build, tag, and push the image to Amazon ECR
-        if: ${{matrix.lambda} == 'ca' }}
+        if: ${{matrix.lambda == 'ca' }}
         id: build-image
         uses: docker/build-push-action@v5
         with:
