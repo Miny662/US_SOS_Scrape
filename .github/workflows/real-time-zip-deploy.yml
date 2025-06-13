@@ -2,13 +2,29 @@ name: Real-Time .zip Deploy
 on:
   push:
     branches:
-      - main
+      - PAL-2219_ci_cd_updates
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
 jobs:
+  autodiscover:
+    runs-on: ubuntu-latest
+    outputs:
+      lambda_array: ${{ steps.get-lambdas.outputs.lambdas }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get Lambdas
+        id: get-lambdas
+        run: |
+          lambdas=$(tree -d -L 1 -J | jq -j -c '.[0].contents | map(.name)')
+          echo ::set-output name=lambdas::${lambdas}
   zip_and_deploy:
     name: zip and deploy
+    needs: autodiscover
+    strategy:
+      matrix:
+        lambda: ${{ fromJSON(needs.get-filenames.outputs.lambda_array) }}
     runs-on: ubuntu-latest
     outputs:
       zip_name: ${{ steps.create-zip.outputs.zip_name }}
@@ -30,8 +46,8 @@ jobs:
         id: create-zip-and-deploy
         run: |
           cd real-time/AL
+          echo ${{matrix.lambda}}
           pwd
           ls -al
           zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
           ls -al
-          aws lambda update-function-code --function-name palm-realtime-sos-al --zip-file fileb://./real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
