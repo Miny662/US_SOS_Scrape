@@ -21,8 +21,8 @@ jobs:
           tree -d -L 1 -J
           lambdas=$(tree -d -L 1 -J | jq -j -c '.[0].contents | map(.name)')
           echo ::set-output name=lambdas::${lambdas}
-  zip_and_deploy:
-    name: zip and deploy
+  package_and_deploy:
+    name: Package and Deploy
     needs: autodiscover
     strategy:
       matrix:
@@ -63,8 +63,10 @@ jobs:
           if ls -al | grep Dockerfile; then
             echo "DOCKERFILE"
             echo ${{matrix.lambda}}
+            aws lambda update-function-code --function-name palm-realtime-sos-${{matrix.lambda}} --image-uri ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
           else
             echo ${{matrix.lambda}}
             zip -r real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
             ls -al
+            aws lambda update-function-code --function-name palm-realtime-sos-${{matrix.lambda}} --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
           fi
