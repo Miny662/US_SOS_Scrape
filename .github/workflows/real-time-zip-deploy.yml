@@ -49,10 +49,13 @@ jobs:
         if: ${{ hashFiles('real-time/${{matrix.lambda}}/Dockerfile') == '' }}
         run: |
           cd real-time/${{matrix.lambda}}
-          echo ${{ github.workspace }}
-          echo ${{ hashFiles('real-time/${{matrix.lambda}}/Dockerfile') }}
-          echo ${{matrix.lambda}}
-          pwd
-          ls -al
-          zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
-          ls -al
+          if ls -al | grep Dockerfile; then
+            ls -al
+            echo "DOCKERFILE"
+          else
+            echo ${{matrix.lambda}}
+            pwd
+            ls -al
+            zip -r real_time_al_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
+            ls -al
+          fi
