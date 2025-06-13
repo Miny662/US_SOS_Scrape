@@ -1,0 +1,72 @@
+name: Real-Time .zip Deploy
+on:
+  push:
+    branches:
+      - main
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+jobs:
+  autodiscover:
+    runs-on: ubuntu-latest
+    outputs:
+      lambda_array: ${{ steps.get-lambdas.outputs.lambdas }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Get Lambdas
+        id: get-lambdas
+        run: |
+          cd real-time
+          tree -d -L 1 -J
+          lambdas=$(tree -d -L 1 -J | jq -j -c '.[0].contents | map(.name)')
+          echo ::set-output name=lambdas::${lambdas}
+  package_and_deploy:
+    name: Package and Deploy
+    needs: autodiscover
+    strategy:
+      matrix:
+        lambda: ${{ fromJSON(needs.autodiscover.outputs.lambda_array) }}
+    runs-on: ubuntu-latest
+    outputs:
+      zip_name: ${{ steps.create-zip.outputs.zip_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Assume AWS IAM Role
+        uses: aws-actions/configure-aws-credentials@e3dd6a429d7300a6a4c196c26e071d42e0343502
+        with:
+          role-to-assume: ${{ secrets.CI_CD_IAM_ROLE }}
+          aws-region: us-east-1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Get commit hash
+        id: get-commit-hash
+        run: echo "::set-output name=commit-hash::$(git rev-parse --short HEAD)"
+      - name: Get timestamp
+        id: get-timestamp
+        run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
+      - name: Build, tag, and push the image to Amazon ECR
+        if: ${{matrix.lambda == 'ca' }}
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./real-time/${{matrix.lambda}}
+          file: ./real-time/${{matrix.lambda}}/Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
+      - name: Create package and deploy
+        id: create-package-and-deploy
+        run: |
+          cd real-time/${{matrix.lambda}}
+          if ls -al | grep Dockerfile; then
+            echo "DOCKERFILE"
+            echo ${{matrix.lambda}}
+            aws lambda update-function-code --function-name palm-realtime-sos-${{matrix.lambda}} --image-uri ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
+          else
+            echo ${{matrix.lambda}}
+            zip -r real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
+            ls -al
+            aws lambda update-function-code --function-name palm-realtime-sos-${{matrix.lambda}} --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
+          fi
