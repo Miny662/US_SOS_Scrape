@@ -46,8 +46,9 @@ jobs:
         run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
       - name: Create zip and deploy
         id: create-zip-and-deploy
+        if: ${{ hashFiles('real-time/${{matrix.lambda}}/Dockerfile') == '' }}
         run: |
-          cd real-time/AL
+          cd real-time/${{matrix.lambda}}
           echo ${{matrix.lambda}}
           pwd
           ls -al
