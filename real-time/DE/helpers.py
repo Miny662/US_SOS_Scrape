@@ -6,7 +6,7 @@ import os
 import datetime
 
 
-class Helpers(object):
+class Helpers:
     def __init__(self):
         pass
 

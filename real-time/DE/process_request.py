@@ -23,7 +23,7 @@ class ProcessRequest(object):
 
     # retry 
     def retry(self, n):
-        N_ATTEMPS = 10
+        N_ATTEMPS = 12
         WAIT_TIME = 5
         print("reconnecting...", flush=True)
         time.sleep(WAIT_TIME)
