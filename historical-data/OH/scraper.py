@@ -1,132 +1,98 @@
 #!/usr/bin/env python
 # coding: utf8
 
-import undetected_chromedriver as uc
 import time
-import signal
+import random
 from process_request import ProcessRequest
 from helpers import Helpers
 
-def safe_quit(self):
-    try:
-        original_quit(self)
-    except OSError as e:
-        if getattr(e, 'winerror', None) == 6:
-            pass
-        else:
-            raise
-
-# Store the original quit method
-original_quit = uc.Chrome.quit
-# Replace with our safe version
-uc.Chrome.quit = safe_quit
-
-class OhioScraper:
+class Scraper:
     def __init__(self):
-        self.base_url = "https://businesssearch.ohiosos.gov"
-        self.processor = ProcessRequest()
+        self.pr = ProcessRequest()
         self.helpers = Helpers()
-        self.save_interval = 100  # Save every 100 records
-        self.current_id = None
-        self.current_batch = []
         
-        # Set up signal handlers for graceful shutdown
-        signal.signal(signal.SIGINT, self.handle_interrupt)
-        signal.signal(signal.SIGTERM, self.handle_interrupt)
-
-    def handle_interrupt(self, signum, frame):
-        """Handle interrupt signals by saving current progress"""
-        print("\nReceived interrupt signal. Saving progress...")
-        if self.current_id is not None and self.current_batch:
-            self.helpers.save_checkpoint(self.current_id - 1, self.current_batch)
-        raise KeyboardInterrupt
-
-    def get_cookies(self, url):
-        options = uc.ChromeOptions()
-        driver = uc.Chrome(options=options)
-        try:
-            driver.get(url)
-            input("Solve CAPTCHA manually, then press Enter to continue...")
-            selenium_cookies = driver.get_cookies()
-            cookies = {c['name']: c['value'] for c in selenium_cookies}
-            return cookies
-        finally:
-            time.sleep(0.5)
-            driver.quit()
-
-    def process_records(self, start_id, end_id, cookies):
-        """Process a range of business records"""
-        self.current_batch = []
+        # Use output directory for file paths
+        self.DATA_FILE = self.helpers.get_output_path("ohio_business_data.jsonl")
+        self.CHECKPOINT_FILE = self.helpers.get_output_path("checkpoint.txt")
         
-        try:
-            for entity_id in range(start_id, end_id + 1):
-                self.current_id = entity_id
-                print(f"Fetching data for entity ID {entity_id}...")
-                data = self.processor.call_api(str(entity_id), cookies)
-                extracted = self.processor.extract_data(data, entity_id) if data else None
+        self.STATE = "ohio"
+        self.START_ID = 1
+        self.END_ID = 120000
 
-                if extracted:
-                    print(f"  Got data: {extracted['business_name']}")
-                    print(f"  URL: {extracted['source_url']}")
+    def extract_data(self, data, entity_id):
+        try:
+            data_list = data.get('data', [])
+            if len(data_list) < 5:
+                print("Unexpected data format or missing panels")
+                return None
+
+            firstpanel = data_list[4]
+            listing = data_list[2]
+
+            info = firstpanel.get('firstpanel', [{}])[0]
+            filings = [{
+                "filing_type": f.get('tran_code_desc'),
+                "date_of_filing": f.get('effect_date'),
+                "document_id": f.get('processing_id')
+            } for f in listing.get('listing', [])]
+
+            if not info.get('business_name'):
+                print("No business name found, skipping")
+                return None
+
+            return {
+                "business_name": info.get('business_name'),
+                "entity": info.get('charter_num'),
+                "filing_type": info.get('business_type'),
+                "original_filing_date": info.get('effect_date'),
+                "status": info.get('status'),
+                "expiry_date": info.get('expiry_date'),
+                "filings": filings,
+                "url": f"https://businesssearch.ohiosos.gov/?=businessDetails/{entity_id}"
+            }
+        except Exception as e:
+            print(f"Data extraction error: {e}")
+            return None
+
+    def jsonl_out(self, items):
+        if items:
+            self.helpers.save_to_jsonl(items, self.DATA_FILE)
+
+    def parser_items(self, entity_id):
+        print(f"Processing entity {entity_id} - URL: https://businesssearch.ohiosos.gov/?=businessDetails/{entity_id}")
+        data = self.pr.call_api_with_browser(str(entity_id))
+        
+        if data:
+            extracted = self.extract_data(data, entity_id)
+            if extracted:
+                self.jsonl_out(extracted)
+                return True
+            else:
+                print(f"No valid data for entity {entity_id}, skipping.")
+                return True
+        return False
+
+    def parser(self):
+        self.pr.get_cookies_and_driver("https://businesssearch.ohiosos.gov/")
+        entity_id = self.helpers.load_checkpoint(self.CHECKPOINT_FILE)
+
+        try:
+            while entity_id < self.END_ID and not self.helpers.STOP_SIGNAL:
+                success = self.parser_items(entity_id)
+                
+                if success:
+                    entity_id += 1
+                    self.helpers.save_checkpoint(entity_id, self.CHECKPOINT_FILE)
                 else:
-                    print(f"  No valid data for entity ID {entity_id}")
-
-                self.current_batch.append(extracted)
-
-                # Save progress every save_interval records
-                if len(self.current_batch) >= self.save_interval:
-                    self.helpers.save_checkpoint(entity_id, self.current_batch)
-                    self.current_batch = []  # Clear the batch after saving
-
-                time.sleep(3)  # Delay to avoid rate limits
-
-            # Save any remaining records in the final batch
-            if self.current_batch:
-                self.helpers.save_checkpoint(end_id, self.current_batch)
-
-        except Exception as e:
-            # In case of error, save the current batch and re-raise the exception
-            if self.current_batch:
-                last_id = self.current_id - 1 if self.current_id else start_id
-                self.helpers.save_checkpoint(last_id, self.current_batch)
-            raise
-
-    def run(self, start_id=None, end_id=1200000):
-        """Run the scraper"""
-        # Load last processed ID from checkpoint if no start_id provided
-        if start_id is None:
-            start_id = self.helpers.load_checkpoint() + 1
-
-        if start_id > end_id:
-            print("Start ID is greater than end ID. Nothing to process.")
-            return
-
-        print(f"Starting scrape from ID {start_id} to {end_id}")
-        start_url = "https://businesssearch.ohiosos.gov/?=businessDetails/1"
-        
-        try:
-            cookies = self.get_cookies(start_url)
-            self.process_records(start_id, end_id, cookies)
-            print("\nScraping completed successfully!")
-
-        except KeyboardInterrupt:
-            print("\nScraping interrupted by user. Progress has been saved.")
-        except Exception as e:
-            print(f"\nAn error occurred: {e}")
+                    print(f"Failed to fetch data for entity {entity_id}, retrying same ID after delay...")
+                    time.sleep(30)
+                    continue
+                
+                time.sleep(random.uniform(4, 6))
+                
         finally:
-            # One final save attempt in case of any unsaved data
-            if self.current_batch and self.current_id:
-                try:
-                    self.helpers.save_checkpoint(self.current_id - 1, self.current_batch)
-                except Exception as e:
-                    print(f"Error saving final checkpoint: {e}")
-            print("\nScraping session ended. You can resume from the last checkpoint later.")
+            self.pr.cleanup()
+            print("Clean shutdown completed.")
 
 if __name__ == "__main__":
-    scraper = OhioScraper()
-    scraper.run() 
-
-
-
-
-    
+    Scraper().parser() 
