@@ -85,6 +85,7 @@ jobs:
             --action lambda:invokeFunctionUrl \
             --principal '*' \
             --statement-id allow-public-invocation \
+            --function-url-auth-type NONE
       - name: Create package and deploy
         id: create-package-and-deploy
         if: ${{matrix.lambda == 'de' && steps.check-lambda.outputs.lambda_exists == 'true'}}
