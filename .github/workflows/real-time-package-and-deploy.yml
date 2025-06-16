@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - PAL-2238_add_real_time_delaware
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
@@ -58,6 +59,7 @@ jobs:
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
       - name: Create package and deploy
         id: create-package-and-deploy
+        if: ${{matrix.lambda == 'de' }}
         run: |
           cd real-time/${{matrix.lambda}}
           if ls -al | grep Dockerfile; then
