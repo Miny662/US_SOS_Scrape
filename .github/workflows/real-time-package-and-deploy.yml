@@ -72,12 +72,10 @@ jobs:
         run: |
           cd real-time/${{matrix.lambda}}
           echo ${{ steps.check-lambda.outputs.lambda_exists }}
-          if ${{ steps.check-lambda.outputs.lambda_exists }} == 'false'; then
-            echo ${{matrix.lambda}}
-            zip -r real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
-            ls -al
-            aws lambda create-function --function-name palm-realtime-sos-${{matrix.lambda}} --runtime python3.10 --handler lambda_function.lambda_handler --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
-          fi
+          echo ${{matrix.lambda}}
+          zip -r real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
+          ls -al
+          aws lambda create-function --function-name palm-realtime-sos-${{matrix.lambda}} --runtime python3.10 --handler lambda_function.lambda_handler --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
       - name: Create package and deploy
         id: create-package-and-deploy
         if: ${{matrix.lambda == 'de' && steps.check-lambda.outputs.lambda_exists == 'true'}}
