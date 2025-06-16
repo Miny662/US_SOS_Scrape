@@ -1,6 +1,7 @@
 #file: noinspection YAMLSchemaValidation
 name: Real-Time Lambda Deploy
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
