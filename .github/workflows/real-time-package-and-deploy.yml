@@ -1,8 +1,11 @@
-name: Real-Time .zip Deploy
+#file: noinspection YAMLSchemaValidation
+name: Real-Time Lambda Deploy
 on:
   push:
     branches:
       - main
+    paths:
+      - real-time/**
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
@@ -47,8 +50,24 @@ jobs:
       - name: Get timestamp
         id: get-timestamp
         run: echo "::set-output name=timestamp::$(date +'%Y-%m-%d-%H-%M')"
+      - name: Check if Lambda function exists
+        id: check-lambda
+        run: |
+          if aws lambda get-function --function-name palm-realtime-sos-${{matrix.lambda}}; then
+            echo "::set-output name=lambda_exists::true"
+          else
+            echo "::set-output name=lambda_exists::false"
+          fi
+      - name: Check if Dockerfile exists
+        id: check-dockerfile
+        run: |
+          if ls -al | grep Dockerfile; then
+            echo "::set-output name=dockerfile_exists::true"
+          else
+            echo "::set-output name=dockerfile_exists::false"
+          fi
       - name: Build, tag, and push the image to Amazon ECR
-        if: ${{matrix.lambda == 'ca' }}
+        if: ${{ steps.check-dockerfile.outputs.dockerfile_exists }}
         id: build-image
         uses: docker/build-push-action@v5
         with:
@@ -56,10 +75,33 @@ jobs:
           file: ./real-time/${{matrix.lambda}}/Dockerfile
           push: true
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
-      - name: Create package and deploy
-        id: create-package-and-deploy
+      - name: First time deploy
+        id: first-time-deploy
+        if: ${{ steps.check-lambda.outputs.lambda_exists == 'false'}}
         run: |
           cd real-time/${{matrix.lambda}}
+          echo ${{ steps.check-lambda.outputs.lambda_exists }}
+          echo ${{matrix.lambda}}
+          zip -r real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip .
+          ls -al
+          aws lambda create-function --function-name palm-realtime-sos-${{matrix.lambda}} \
+            --role ${{ secrets.SCRAPER_LAMBDA_ROLE_ARN }}\
+            --runtime python3.10 \
+            --handler lambda_function.lambda_handler \
+            --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip \
+            --layers "arn:aws:lambda:us-east-1:430118818332:layer:requests-bs4-layer:1"
+          aws lambda create-function-url-config --function-name palm-realtime-sos-${{matrix.lambda}} --auth-type NONE
+          aws lambda add-permission --function-name palm-realtime-sos-${{matrix.lambda}} \
+            --action lambda:invokeFunctionUrl \
+            --principal '*' \
+            --statement-id allow-public-invocation \
+            --function-url-auth-type NONE
+      - name: Create package and deploy
+        id: create-package-and-deploy
+        if: ${{ steps.check-lambda.outputs.lambda_exists == 'true'}}
+        run: |
+          cd real-time/${{matrix.lambda}}
+          echo ${{ steps.check-lambda.outputs.lambda_exists }}
           if ls -al | grep Dockerfile; then
             echo "DOCKERFILE"
             echo ${{matrix.lambda}}
