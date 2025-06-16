@@ -83,7 +83,7 @@ jobs:
           aws lambda create-function-url-config --function-name palm-realtime-sos-${{matrix.lambda}} --auth-type NONE
           aws lambda add-permission --function-name palm-realtime-sos-${{matrix.lambda}} \
             --action lambda:invokeFunctionUrl \
-            --principal * \
+            --principal '*' \
             --statement-id allow-public-invocation \
       - name: Create package and deploy
         id: create-package-and-deploy
