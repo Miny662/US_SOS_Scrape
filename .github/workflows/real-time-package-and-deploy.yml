@@ -79,7 +79,8 @@ jobs:
             --role ${{ secrets.SCRAPER_LAMBDA_ROLE_ARN }}\
             --runtime python3.10 \
             --handler lambda_function.lambda_handler \
-            --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
+            --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip \
+            --layers "arn:aws:lambda:us-east-1:430118818332:layer:requests-bs4-layer:1"
           aws lambda create-function-url-config --function-name palm-realtime-sos-${{matrix.lambda}} --auth-type NONE
           aws lambda add-permission --function-name palm-realtime-sos-${{matrix.lambda}} \
             --action lambda:invokeFunctionUrl \
