@@ -67,7 +67,7 @@ jobs:
             echo "::set-output name=dockerfile_exists::false"
           fi
       - name: Build, tag, and push the image to Amazon ECR
-        if: ${{ steps.check-dockerfile.outputs.dockerfile_exists }}
+        if: ${{ steps.check-dockerfile.outputs.dockerfile_exists == 'true'}}
         id: build-image
         uses: docker/build-push-action@v5
         with:
