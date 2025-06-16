@@ -62,6 +62,7 @@ jobs:
       - name: Check if Dockerfile exists
         id: check-dockerfile
         run: |
+          cd real-time/${{matrix.lambda}}
           if ls -al | grep Dockerfile; then
             echo "::set-output name=dockerfile_exists::true"
           else
