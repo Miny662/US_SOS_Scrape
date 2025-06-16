@@ -80,6 +80,7 @@ jobs:
             --runtime python3.10 \
             --handler lambda_function.lambda_handler \
             --zip-file fileb://./real_time_${{matrix.lambda}}_${{ steps.get-commit-hash.outputs.commit-hash }}_${{ steps.get-timestamp.outputs.timestamp }}.zip
+          aws lambda create-function-url-config --function-name palm-realtime-sos-${{matrix.lambda}}
       - name: Create package and deploy
         id: create-package-and-deploy
         if: ${{matrix.lambda == 'de' && steps.check-lambda.outputs.lambda_exists == 'true'}}
