@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - PAL-2238_add_real_time_delaware
+    paths:
+      - real-time/**
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
@@ -57,8 +58,16 @@ jobs:
           else
             echo "::set-output name=lambda_exists::false"
           fi
+      - name: Check if Dockerfile exists
+        id: check-dockerfile
+        run: |
+          if ls -al | grep Dockerfile; then
+            echo "::set-output name=dockerfile_exists::true"
+          else
+            echo "::set-output name=dockerfile_exists::false"
+          fi
       - name: Build, tag, and push the image to Amazon ECR
-        if: ${{matrix.lambda == 'ca' }}
+        if: ${{ steps.check-dockerfile.outputs.dockerfile_exists }}
         id: build-image
         uses: docker/build-push-action@v5
         with:
@@ -68,7 +77,7 @@ jobs:
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
       - name: First time deploy
         id: first-time-deploy
-        if: ${{matrix.lambda == 'de' && steps.check-lambda.outputs.lambda_exists == 'false'}}
+        if: ${{ steps.check-lambda.outputs.lambda_exists == 'false'}}
         run: |
           cd real-time/${{matrix.lambda}}
           echo ${{ steps.check-lambda.outputs.lambda_exists }}
@@ -89,7 +98,7 @@ jobs:
             --function-url-auth-type NONE
       - name: Create package and deploy
         id: create-package-and-deploy
-        if: ${{matrix.lambda == 'de' && steps.check-lambda.outputs.lambda_exists == 'true'}}
+        if: ${{ steps.check-lambda.outputs.lambda_exists == 'true'}}
         run: |
           cd real-time/${{matrix.lambda}}
           echo ${{ steps.check-lambda.outputs.lambda_exists }}
