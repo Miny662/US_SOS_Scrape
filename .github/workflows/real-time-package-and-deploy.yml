@@ -1,4 +1,5 @@
-name: Real-Time .zip Deploy
+#file: noinspection YAMLSchemaValidation
+name: Real-Time Lambda Deploy
 on:
   push:
     branches:
@@ -70,7 +71,7 @@ jobs:
         if: ${{matrix.lambda == 'de'}}
         run: |
           cd real-time/${{matrix.lambda}}
-          echo ${{ steps.check_lambda.outputs.lambda_exists }}
+          echo ${{ steps.check-lambda.outputs.lambda_exists }}
           if ls -al | grep Dockerfile; then
             echo "DOCKERFILE"
             echo ${{matrix.lambda}}
