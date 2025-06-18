@@ -177,3 +177,7 @@ cython_debug/
 sample_input/
 Pipfile*
 __MACOSX/
+
+# output directories
+historical-data/jsonl_out
+historical-data/Output
