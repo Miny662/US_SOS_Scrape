@@ -7,6 +7,7 @@ on:
       - PAL-2241_package_historical_scrapers
     paths:
       - historical-data/**
+      - .github/workflows/historical-data-package-and-deploy.yml
 permissions:
   id-token: write # This is required for requesting the JWT
   contents: read  # This is required for actions/checkout
