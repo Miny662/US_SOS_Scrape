@@ -30,6 +30,6 @@ class Helpers:
     
     def normalize_item(self, item):
         item = item.replace("\r", "")
-        item  = " ".join(item.split())
+        item = " ".join(item.split())
         item = item.strip()
         return item

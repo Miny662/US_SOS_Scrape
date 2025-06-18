@@ -2,7 +2,8 @@ import json
 import logging
 import requests
 from bs4 import BeautifulSoup
-from helpers import clean_text
+from .helpers import clean_text
+
 
 class ProcessRequest:
     def __init__(self, base_url):
@@ -113,4 +114,4 @@ class ProcessRequest:
         except Exception:
             pass
 
-        return result 
+        return result
