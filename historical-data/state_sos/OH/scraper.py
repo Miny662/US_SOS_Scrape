@@ -3,18 +3,19 @@
 
 import time
 import random
-from process_request import ProcessRequest
-from helpers import Helpers
+from .process_request import ProcessRequest
+from .helpers import Helpers
+
 
 class Scraper:
     def __init__(self):
         self.pr = ProcessRequest()
         self.helpers = Helpers()
-        
+
         # Use output directory for file paths
         self.DATA_FILE = self.helpers.get_output_path("ohio_business_data.jsonl")
         self.CHECKPOINT_FILE = self.helpers.get_output_path("checkpoint.txt")
-        
+
         self.STATE = "ohio"
         self.START_ID = 1
         self.END_ID = 120000
@@ -61,7 +62,7 @@ class Scraper:
     def parser_items(self, entity_id):
         print(f"Processing entity {entity_id} - URL: https://businesssearch.ohiosos.gov/?=businessDetails/{entity_id}")
         data = self.pr.call_api_with_browser(str(entity_id))
-        
+
         if data:
             extracted = self.extract_data(data, entity_id)
             if extracted:
@@ -72,14 +73,14 @@ class Scraper:
                 return True
         return False
 
-    def parser(self):
+    def run(self):
         self.pr.get_cookies_and_driver("https://businesssearch.ohiosos.gov/")
         entity_id = self.helpers.load_checkpoint(self.CHECKPOINT_FILE)
 
         try:
             while entity_id < self.END_ID and not self.helpers.STOP_SIGNAL:
                 success = self.parser_items(entity_id)
-                
+
                 if success:
                     entity_id += 1
                     self.helpers.save_checkpoint(entity_id, self.CHECKPOINT_FILE)
@@ -87,12 +88,13 @@ class Scraper:
                     print(f"Failed to fetch data for entity {entity_id}, retrying same ID after delay...")
                     time.sleep(30)
                     continue
-                
+
                 time.sleep(random.uniform(4, 6))
-                
+
         finally:
             self.pr.cleanup()
             print("Clean shutdown completed.")
 
+
 if __name__ == "__main__":
-    Scraper().parser() 
+    Scraper().run()

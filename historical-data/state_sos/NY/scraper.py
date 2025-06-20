@@ -6,8 +6,8 @@ from urllib.parse import urljoin
 
 import jsonlines
 
-from process_request import ProcessRequest 
-from helpers import Helpers
+from .process_request import ProcessRequest
+from .helpers import Helpers
 
 
 class Scraper:
@@ -113,7 +113,7 @@ class Scraper:
         items = self.parser_items_details(id)
         return items
 
-    def parser(self):        
+    def run(self):
         for id in range(self.START_ID, self.END_ID):
             id = str(id)
             try:
@@ -126,4 +126,4 @@ class Scraper:
 
 
 if __name__ == "__main__":
-    Scraper().parser()
+    Scraper().run()

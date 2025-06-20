@@ -25,7 +25,7 @@ It supports:
 ## 🧰 Requirements
 
 - Python **3.8+**
-- Dependencies listed in [`requirements.txt`](./requirements.txt)
+- Dependencies listed in [`requirements.txt`](requirements.txt)
 
 ---
 

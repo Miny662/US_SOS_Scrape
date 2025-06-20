@@ -196,7 +196,7 @@ class Scraper:
                         yield items
 
     # start scraper
-    def parser(self):
+    def run(self):
         result = {}
         n = 1
         for self.file_number in range(self.START_ID, self.END_ID):
@@ -243,4 +243,4 @@ class Scraper:
     
 
 if __name__ == "__main__":
-    Scraper().parser()
+    Scraper().run()

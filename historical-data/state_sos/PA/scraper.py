@@ -7,11 +7,10 @@ import json
 import re
 from urllib.parse import urljoin
 
-from bs4 import BeautifulSoup
 import jsonlines
 
-from process_request import ProcessRequest
-from helpers import Helpers
+from .process_request import ProcessRequest
+from .helpers import Helpers
 
 
 class Scraper(object):
@@ -192,7 +191,7 @@ class Scraper(object):
                                 break
 
     # start scraper
-    def parser(self):
+    def run(self):
         n = 0
         for id in range(self.START_ID, self.END_ID):
             print(id, "****")
@@ -231,4 +230,4 @@ class Scraper(object):
                 
 
 if __name__ == "__main__":
-    Scraper().parser()
+    Scraper().run()

@@ -5,8 +5,8 @@ import logging
 import random
 import threading
 import requests
-from process_request import ProcessRequest
-from helpers import (
+from .process_request import ProcessRequest
+from .helpers import (
     clean_text,
     get_data_files,
     load_range_progress,
@@ -15,10 +15,11 @@ from helpers import (
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s: %(message)s')
 
+
 class Scraper:
     def __init__(self):
         self.BASE_URL = "https://corp.sos.ms.gov"
-        self.PROXY_FILE = "Webshare 1000 proxies - option 1.txt"
+        self.PROXY_FILE = "./state_sos/MS/Webshare 1000 proxies - option 1.txt"
         self.OUTPUT_DIR = "Output"
         self.MERGED_FILE = os.path.join(self.OUTPUT_DIR, "merged_data.jsonl")
         os.makedirs(self.OUTPUT_DIR, exist_ok=True)
@@ -26,7 +27,7 @@ class Scraper:
         self.START_ID = 650001
         self.TOTAL_IDS = 500
         self.END_ID = self.START_ID + self.TOTAL_IDS - 1
-        self.REQUEST_INTERVAL = 1.0 
+        self.REQUEST_INTERVAL = 1.0
 
         self.process_request = ProcessRequest(self.BASE_URL)
 
@@ -58,7 +59,7 @@ class Scraper:
         progress_file = os.path.join(self.OUTPUT_DIR, f"progress_ids_{start_id}_to_{end_id}.json")
 
         last_completed_id = load_range_progress(progress_file, start_id)
-        logging.info(f"Proxy for IDs {start_id}-{end_id} resuming from {last_completed_id+1}")
+        logging.info(f"Proxy for IDs {start_id}-{end_id} resuming from {last_completed_id + 1}")
 
         count = 0
         for business_id in range(last_completed_id + 1, end_id + 1):
@@ -73,7 +74,8 @@ class Scraper:
                     with open(output_file, "a", encoding="utf-8") as f:
                         f.write(json.dumps(data, ensure_ascii=False) + "\n")
                     count += 1
-                    logging.info(f"Proxy for IDs {start_id}-{end_id}: Saved Business ID {business_id} (Total saved: {count})")
+                    logging.info(
+                        f"Proxy for IDs {start_id}-{end_id}: Saved Business ID {business_id} (Total saved: {count})")
                 else:
                     logging.warning(f"Proxy for IDs {start_id}-{end_id}: No HTML for Business ID {business_id}")
             else:
@@ -147,7 +149,7 @@ class Scraper:
             threads.append(t)
             t.start()
 
-            logging.info(f"Assigned IDs {current_start} to {current_end} to proxy {i+1}")
+            logging.info(f"Assigned IDs {current_start} to {current_end} to proxy {i + 1}")
 
             current_start = current_end + 1
 
@@ -164,5 +166,6 @@ class Scraper:
             self.merge_files(data_files_to_merge, self.MERGED_FILE)
             logging.info(f"All data merged into {self.MERGED_FILE}")
 
+
 if __name__ == "__main__":
-    Scraper().run() 
+    Scraper().run()
