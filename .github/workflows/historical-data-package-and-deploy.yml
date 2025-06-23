@@ -6,7 +6,7 @@ on:
       - main
       - PAL-2241_package_historical_scrapers
     paths:
-      - historical-data/**
+      - historical_data/**
       - .github/workflows/historical-data-package-and-deploy.yml
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -39,6 +39,6 @@ jobs:
           ECR_REPOSITORY: ${{ secrets.ECR_HISTORICAL_DATA_REPO_NAME }}
           IMAGE_TAG: ${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
         run: |
-          cd historical-data
+          cd historical_data
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
