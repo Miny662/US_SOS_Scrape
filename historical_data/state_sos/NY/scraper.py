@@ -8,20 +8,18 @@ import jsonlines
 
 from .process_request import ProcessRequest
 from .helpers import Helpers
+from state_sos.base_scraper import BaseScraper
 
 
-class Scraper:
-    def __init__(self, start_id: int = 1, end_id: int = 7800000):
+class Scraper(BaseScraper):
+    def __init__(self, state: str, start_id: int = 1, end_id: int = 7800000):
+        super().__init__(state, start_id, end_id)
         self.pr = ProcessRequest()
         self.helpers = Helpers()
         
         self.FOLDER = self.helpers.create_folder("jsonl_out")
 
         self.URL_BASE = "https://apps.dos.ny.gov"
-
-        self.STATE = "new_york"
-        self.START_ID = start_id
-        self.END_ID = end_id
 
     def get_headers(self, index, url_refer=None):
         user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"

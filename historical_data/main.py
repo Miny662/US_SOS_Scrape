@@ -11,7 +11,7 @@ def get_scraper(state_code: str):
     state_map = {
         'ms': MississippiScraper(),
         # 'de': DelawareScraper(),
-        'ny': NewYorkScraper(),
+        'ny': NewYorkScraper(state="new_york"),
         'oh': OhioScraper(),
         'pa': PennsylvaniaScraper()
     }
