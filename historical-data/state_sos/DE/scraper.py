@@ -14,10 +14,12 @@ import jsonlines
 from process_request import ProcessRequest
 from solve_recaptcha import SolveRecaptcha
 from helpers import Helpers
+from state_sos.base_scraper import BaseScraper
 
 
-class Scraper:
-    def __init__(self):
+class Scraper(BaseScraper):
+    def __init__(self, start_id: int = 1, end_id: int = 11000000):
+        super().__init__(start_id, end_id)
         self.file_number = None
         
         self.pr = ProcessRequest()
@@ -29,11 +31,7 @@ class Scraper:
         self.URL_BASE = "https://icis.corp.delaware.gov/"
         self.URL = urljoin(self.URL_BASE, "Ecorp/EntitySearch/NameSearch.aspx")
         self.SITE_KEY = "6Le1dNQZAAAAAGYNA9djIXojESuOKtvMLtRoga3r"
-
         self.STATE = "delaware"
-
-        self.START_ID = 1
-        self.END_ID = 11000000
 
     # set headers
     def get_headers(self, index, url_refer=None):
