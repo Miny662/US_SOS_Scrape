@@ -179,5 +179,5 @@ Pipfile*
 __MACOSX/
 
 # output directories
-historical-data/jsonl_out
-historical-data/Output
+historical_data/jsonl_out
+historical_data/Output

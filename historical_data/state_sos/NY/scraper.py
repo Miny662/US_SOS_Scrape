@@ -11,7 +11,7 @@ from .helpers import Helpers
 
 
 class Scraper:
-    def __init__(self):
+    def __init__(self, start_id: int = 1, end_id: int = 7800000):
         self.pr = ProcessRequest()
         self.helpers = Helpers()
         
@@ -20,8 +20,8 @@ class Scraper:
         self.URL_BASE = "https://apps.dos.ny.gov"
 
         self.STATE = "new_york"
-        self.START_ID = 1
-        self.END_ID = 7800000
+        self.START_ID = start_id
+        self.END_ID = end_id
 
     def get_headers(self, index, url_refer=None):
         user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
