@@ -21,6 +21,7 @@ class Scraper(BaseScraper):
 
         self.URL_BASE = "https://apps.dos.ny.gov"
         self.STATE = "new_york"
+        self.state_code = 'ny'
 
     def get_headers(self, index, url_refer=None):
         user_agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0"
@@ -117,7 +118,7 @@ class Scraper(BaseScraper):
             id = str(id)
             try:
                 items = self.parser_items(id)
-                self.jsonl_out(items)
+                self.write_to_s3(items, id)
                 print(items)
                 print("*" *75)                
             except Exception as e:
