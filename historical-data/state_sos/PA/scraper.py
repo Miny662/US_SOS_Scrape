@@ -28,6 +28,7 @@ class Scraper(BaseScraper):
         self.URL = urljoin(self.URL_BASE, "search/business")
         self.URL_POST = urljoin(self.URL_BASE, "api/Records/businesssearch")
         self.STATE = 'pennsylvania'
+        self.state_code = 'pa'
 
     # set headers
     def get_headers(self, index, url_refer=None):
@@ -209,7 +210,7 @@ class Scraper(BaseScraper):
                     for items in self.parser_items(response, id):                        
                         print(n, "###")
                         n = n + 1
-                        self.jsonl_out(items)
+                        self.write_to_s3(items, id)
                         print(items)
                         print("*" *75)
                         time.sleep(1)
