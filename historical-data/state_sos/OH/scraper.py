@@ -18,6 +18,7 @@ class Scraper(BaseScraper):
         self.DATA_FILE = self.helpers.get_output_path("ohio_business_data.jsonl")
         self.CHECKPOINT_FILE = self.helpers.get_output_path("checkpoint.txt")
         self.STATE = 'ohio'
+        self.state_code = 'oh'
 
     def extract_data(self, data, entity_id):
         try:
@@ -65,7 +66,7 @@ class Scraper(BaseScraper):
         if data:
             extracted = self.extract_data(data, entity_id)
             if extracted:
-                self.jsonl_out(extracted)
+                self.write_to_s3(extracted, entity_id)
                 return True
             else:
                 print(f"No valid data for entity {entity_id}, skipping.")
