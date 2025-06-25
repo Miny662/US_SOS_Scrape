@@ -68,7 +68,7 @@ class Scraper:
                     label = element.select_one("LABEL")
                     label = label.text.strip()
                     value = element.select_one("VALUE")
-                    if "Address" in label:
+                    if "Address" in label or "Agent" in label:
                         # keep new line
                         items[label] = value.text.strip()
                     else:
