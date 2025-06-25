@@ -5,20 +5,20 @@ import time
 import random
 from .process_request import ProcessRequest
 from .helpers import Helpers
+from state_sos.base_scraper import BaseScraper
 
 
-class Scraper:
-    def __init__(self):
+class Scraper(BaseScraper):
+    def __init__(self, start_id: int = 1, end_id: int = 120000):
+        super().__init__(start_id, end_id)
         self.pr = ProcessRequest()
         self.helpers = Helpers()
 
         # Use output directory for file paths
         self.DATA_FILE = self.helpers.get_output_path("ohio_business_data.jsonl")
         self.CHECKPOINT_FILE = self.helpers.get_output_path("checkpoint.txt")
-
-        self.STATE = "ohio"
-        self.START_ID = 1
-        self.END_ID = 120000
+        self.STATE = 'ohio'
+        self.state_code = 'oh'
 
     def extract_data(self, data, entity_id):
         try:
@@ -66,7 +66,7 @@ class Scraper:
         if data:
             extracted = self.extract_data(data, entity_id)
             if extracted:
-                self.jsonl_out(extracted)
+                self.write_to_s3(extracted, entity_id)
                 return True
             else:
                 print(f"No valid data for entity {entity_id}, skipping.")

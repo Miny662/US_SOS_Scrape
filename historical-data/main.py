@@ -5,17 +5,20 @@ from state_sos.MS.scraper import Scraper as MississippiScraper
 from state_sos.NY.scraper import Scraper as NewYorkScraper
 from state_sos.OH.scraper import Scraper as OhioScraper
 from state_sos.PA.scraper import Scraper as PennsylvaniaScraper
+from state_sos.util.config import CONFIG
 
 
 def get_scraper(state_code: str):
     state_map = {
-        'ms': MississippiScraper(),
-        # 'de': DelawareScraper(),
-        'ny': NewYorkScraper(),
-        'oh': OhioScraper(),
-        'pa': PennsylvaniaScraper()
+        'ms': MississippiScraper,
+        # 'de': DelawareScraper,
+        'ny': NewYorkScraper,
+        'oh': OhioScraper,
+        'pa': PennsylvaniaScraper
     }
-    return state_map[state_code.lower()]
+    if CONFIG.sos_scraper_environment == 'local':
+        return state_map[state_code.lower()](start_id=119990, end_id=120000)
+    return state_map[state_code.lower()]()
 
 
 if __name__ == "__main__":

@@ -11,10 +11,12 @@ import jsonlines
 
 from .process_request import ProcessRequest
 from .helpers import Helpers
+from state_sos.base_scraper import BaseScraper
 
 
-class Scraper(object):
-    def __init__(self):
+class Scraper(BaseScraper):
+    def __init__(self, start_id: int = 1, end_id: int = 3000000):
+        super().__init__(start_id, end_id)
         self.prequest = ProcessRequest()
 
         self.helpers = Helpers()
@@ -25,11 +27,8 @@ class Scraper(object):
         self.URL_BASE = "https://file.dos.pa.gov/"
         self.URL = urljoin(self.URL_BASE, "search/business")
         self.URL_POST = urljoin(self.URL_BASE, "api/Records/businesssearch")
-
-        self.STATE = "pennsylvania"
-
-        self.START_ID = 1
-        self.END_ID = 3000000
+        self.STATE = 'pennsylvania'
+        self.state_code = 'pa'
 
     # set headers
     def get_headers(self, index, url_refer=None):
@@ -211,7 +210,7 @@ class Scraper(object):
                     for items in self.parser_items(response, id):                        
                         print(n, "###")
                         n = n + 1
-                        self.jsonl_out(items)
+                        self.write_to_s3(items, id)
                         print(items)
                         print("*" *75)
                         time.sleep(1)
