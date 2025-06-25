@@ -19,7 +19,7 @@ class Scraper:
         self.pr = ProcessRequest()
         self.ps = ProcessSelenium()
         self.URL_BASE = "https://bizfileonline.sos.ca.gov/"
-        self.URL = urljoin(self.URL_BASE, "api/Records/businesssearch")        
+        self.URL = urljoin(self.URL_BASE, "api/Records/businesssearch")
 
     # set headers
     def get_headers(self, index, url_refer=None):
@@ -35,18 +35,18 @@ class Scraper:
                         "Connection": "keep-alive",
                         "Referer": url_refer
                     }
-                  ] 
+                  ]
         return headers[index]
 
     def clean_item(self, item):
         item = " ".join(item.split())
         item = item.strip()
-        return item 
+        return item
 
     def normalize_name(self, item):
         item = re.sub(r'\([^)]*\)|^\"', '', item)
         return item.strip()
-    
+
     def get_record_num(self, item):
         match = re.search(r'\((.*?)\)', item)
         if match:
@@ -55,7 +55,7 @@ class Scraper:
 
     def parser_item_details(self, id, name):
         items = {}
-        url = urljoin(self.URL_BASE, "/api/FilingDetail/business/{}/false".format(id))        
+        url = urljoin(self.URL_BASE, "/api/FilingDetail/business/{}/false".format(id))
         self.ps.initialize_driver()
         if self.ps.status_page("//DRAWER", url):
             soup = BeautifulSoup(self.ps.driverBrowser.page_source, "html.parser")
@@ -68,8 +68,12 @@ class Scraper:
                     label = element.select_one("LABEL")
                     label = label.text.strip()
                     value = element.select_one("VALUE")
-                    items[label] = self.clean_item(value.text.strip())
-        
+                    if "Address" in label:
+                        # keep new line
+                        items[label] = value.text.strip()
+                    else:
+                        items[label] = self.clean_item(value.text.strip())
+
         self.ps.close_driver()
         return items
 
@@ -79,7 +83,7 @@ class Scraper:
         parsed = response.json()
         rows = parsed.get("rows", [])
         for row in rows:
-            row_dict = rows[row] 
+            row_dict = rows[row]
             id = row_dict.get("ID")
             print(id, "***")
             print(row_dict, "***")
@@ -116,12 +120,12 @@ class Scraper:
                    "BANKRUPTCY_YN": False,
                    "FRAUD_YN": False,
                    "LOANS_YN": False,
-                   "AUDITOR_NAME": ""}        
+                   "AUDITOR_NAME": ""}
         return params
 
     # start scraper
     def parser(self):
-        if self.id:            
+        if self.id:
             response = self.pr.set_request(
                 self.URL,
                 headers=self.get_headers(0, urljoin(self.URL_BASE, "search/business/")),
@@ -133,7 +137,7 @@ class Scraper:
                 except Exception as e:
                     print("Error: {}".format(e))
                     result = {"success": False,
-                              "message": "Parser error...!!!" 
+                              "message": "Parser error...!!!"
                         }
                 else:
                     result = {"success": True,
@@ -146,6 +150,6 @@ class Scraper:
         else:
             result = {"success": False,
                       "message": "Input parameters failure...!!!"
-                }                    
+                }
 
         return result
