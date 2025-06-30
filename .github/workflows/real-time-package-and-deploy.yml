@@ -77,6 +77,24 @@ jobs:
           file: ./real-time/${{matrix.lambda}}/Dockerfile
           push: true
           tags: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
+      - name: First time deploy Lambda
+        id: first-time-lambda
+        if: ${{ steps.check-lambda.outputs.lambda_exists == 'false' && steps.check-dockerfile.outputs.dockerfile_exists == 'true'}}
+        run: |
+          cd real-time/${{matrix.lambda}}
+          echo ${{ steps.check-lambda.outputs.lambda_exists }}
+          echo ${{matrix.lambda}}
+          aws lambda create-function --function-name palm-realtime-sos-${{matrix.lambda}} \
+            --role ${{ secrets.SCRAPER_LAMBDA_ROLE_ARN }}\
+            --runtime python3.10 \
+            --package-type Image \
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_SOS_SCRAPER_REPO_NAME }}:${{ steps.get-commit-hash.outputs.commit-hash }}-${{ steps.get-timestamp.outputs.timestamp }}
+          aws lambda create-function-url-config --function-name palm-realtime-sos-${{matrix.lambda}} --auth-type NONE
+          aws lambda add-permission --function-name palm-realtime-sos-${{matrix.lambda}} \
+            --action lambda:invokeFunctionUrl \
+            --principal '*' \
+            --statement-id allow-public-invocation \
+            --function-url-auth-type NONE
       - name: First time deploy
         id: first-time-deploy
         if: ${{ steps.check-lambda.outputs.lambda_exists == 'false'}}
