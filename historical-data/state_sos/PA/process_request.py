@@ -16,6 +16,12 @@ class ProcessRequest(object):
         self.session = requests.Session()
         self.session.cookies.clear()
 
+    def set_proxy(self, url: str, port: str, user: str, password: str) -> None:
+        self.session.proxies = {
+            "http": f"http://{user}:{password}@{url}:{port}",
+            "https": f"http://{user}:{password}@{url}:{port}"
+        }
+
     # msg script abruptly terminated        
     def script_terminated(self, msg):
         print("___________________________________________________________________________________")
