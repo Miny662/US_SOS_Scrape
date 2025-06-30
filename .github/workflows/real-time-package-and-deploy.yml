@@ -95,9 +95,9 @@ jobs:
             --principal '*' \
             --statement-id allow-public-invocation \
             --function-url-auth-type NONE
-      - name: First time deploy
-        id: first-time-deploy
-        if: ${{ steps.check-lambda.outputs.lambda_exists == 'false'}}
+      - name: First time deploy zip
+        id: first-time-deploy-zip
+        if: ${{ steps.check-lambda.outputs.lambda_exists == 'false' && steps.check-dockerfile.outputs.dockerfile_exists == 'false'}}
         run: |
           cd real-time/${{matrix.lambda}}
           echo ${{ steps.check-lambda.outputs.lambda_exists }}
