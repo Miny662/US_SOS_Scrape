@@ -2,6 +2,7 @@
 # coding: utf8
 
 import os
+import random
 import time
 import json
 import re
@@ -201,6 +202,13 @@ class Scraper(BaseScraper):
                 "STATUS_ID": "",
                 "FILING_DATE": {"start": None, "end": None}
             }
+            proxy_info = random.choice(self.proxies)
+            self.prequest.set_proxy(
+                url=proxy_info.get('proxyAddress'),
+                port=proxy_info.get('port'),
+                user=proxy_info.get('username'),
+                password=proxy_info.get('password')
+            )
             response = self.prequest.set_request(
                 self.URL_POST,
                 headers=self.get_headers(1, self.URL),

@@ -199,6 +199,13 @@ class Scraper(BaseScraper):
         n = 1
         for self.file_number in range(self.START_ID, self.END_ID):
             print(self.file_number, "***")
+            proxy_info = random.choice(self.proxies)
+            self.pr.set_proxy(
+                url=proxy_info.get('proxyAddress'),
+                port=proxy_info.get('port'),
+                user=proxy_info.get('username'),
+                password=proxy_info.get('password')
+            )
             response = self.pr.set_request(
                 self.URL, headers=self.get_headers(0))
             if response:

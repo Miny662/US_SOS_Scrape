@@ -9,12 +9,21 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from urllib.error import URLError
 import urllib3
+from state_sos.util.proxies import parse_proxy
 
 
 class ProcessRequest(object):
     def __init__(self):
         self.session = requests.Session()
         self.session.cookies.clear()
+
+    def set_proxy(self, url: str, port: str, user: str, password: str) -> None:
+        self.session.proxies = parse_proxy(
+            url=url,
+            port=port,
+            user=user,
+            password=password
+        )
 
     # msg script abruptly terminated        
     def script_terminated(self, msg):
