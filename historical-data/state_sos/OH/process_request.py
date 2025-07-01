@@ -12,6 +12,12 @@ class ProcessRequest:
         self.session.cookies.clear()
         self.driver = None
 
+    def set_proxy(self, url: str, port: str, user: str, password: str) -> None:
+        self.session.proxies = {
+            "http": f"http://{user}:{password}@{url}:{port}",
+            "https": f"http://{user}:{password}@{url}:{port}"
+        }
+
     def get_cookies_and_driver(self, url):
         options = uc.ChromeOptions()
         # Uncomment below if you want headless mode (may affect CAPTCHA solving)

@@ -79,6 +79,14 @@ class Scraper(BaseScraper):
 
         try:
             while entity_id < self.END_ID and not self.helpers.STOP_SIGNAL:
+                proxy_info = random.choice(self.proxies)
+                self.pr.set_proxy(
+                    url=proxy_info.get('proxyAddress'),
+                    port=proxy_info.get('port'),
+                    user=proxy_info.get('username'),
+                    password=proxy_info.get('password')
+                )
+                print(self.pr.session.proxies)
                 success = self.parser_items(entity_id)
 
                 if success:
