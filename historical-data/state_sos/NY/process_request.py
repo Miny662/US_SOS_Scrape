@@ -9,6 +9,7 @@ from urllib.request import urlopen
 from urllib.error import HTTPError
 from urllib.error import URLError
 import urllib3
+from state_sos.util.proxies import parse_proxy
 
 
 class ProcessRequest(object):
@@ -17,10 +18,12 @@ class ProcessRequest(object):
         self.session.cookies.clear()
 
     def set_proxy(self, url: str, port: str, user: str, password: str) -> None:
-        self.session.proxies = {
-            "http": f"http://{user}:{password}@{url}:{port}",
-            "https": f"http://{user}:{password}@{url}:{port}"
-        }
+        self.session.proxies = parse_proxy(
+            url=url,
+            port=port,
+            user=user,
+            password=password
+        )
 
     # msg script abruptly terminated        
     def script_terminated(self, msg):

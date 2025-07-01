@@ -5,6 +5,7 @@ import time
 import random
 import requests
 import undetected_chromedriver as uc
+from state_sos.util.proxies import parse_proxy
 
 class ProcessRequest:
     def __init__(self):
@@ -13,10 +14,12 @@ class ProcessRequest:
         self.driver = None
 
     def set_proxy(self, url: str, port: str, user: str, password: str) -> None:
-        self.session.proxies = {
-            "http": f"http://{user}:{password}@{url}:{port}",
-            "https": f"http://{user}:{password}@{url}:{port}"
-        }
+        self.session.proxies = parse_proxy(
+            url=url,
+            port=port,
+            user=user,
+            password=password
+        )
 
     def get_cookies_and_driver(self, url):
         options = uc.ChromeOptions()
