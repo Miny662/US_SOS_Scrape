@@ -2,6 +2,7 @@
 # coding: utf8
 
 import os
+import random
 from urllib.parse import urljoin
 
 import jsonlines
@@ -87,6 +88,13 @@ class Scraper(BaseScraper):
         print(search_id)
         URL_ENTITY_INFORMATION = urljoin(
             self.URL_BASE, "PublicInquiryWeb/api/PublicInquiry/GetEntityRecordByID")
+        proxy_info = random.choice(self.proxies)
+        self.pr.set_proxy(
+            url=proxy_info.get('proxyAddress'),
+            port=proxy_info.get('port'),
+            user=proxy_info.get('username'),
+            password=proxy_info.get('password')
+        )
         response = self.pr.set_request(URL_ENTITY_INFORMATION, 
             headers=self.get_headers(1), 
             params=self.get_params(
