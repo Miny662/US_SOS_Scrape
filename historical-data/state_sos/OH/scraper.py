@@ -3,8 +3,8 @@
 
 import time
 import random
-from .process_request import ProcessRequest
-from .helpers import Helpers
+from state_sos.OH.process_request import ProcessRequest
+from state_sos.OH.helpers import Helpers
 from state_sos.base_scraper import BaseScraper
 
 
