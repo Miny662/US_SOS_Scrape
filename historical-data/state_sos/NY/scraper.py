@@ -7,7 +7,7 @@ from urllib.parse import urljoin
 
 import jsonlines
 
-from process_request import ProcessRequest
+from state_sos.NY.process_request import ProcessRequest
 from state_sos.NY.helpers import Helpers
 from state_sos.base_scraper import BaseScraper
 

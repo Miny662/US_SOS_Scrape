@@ -7,7 +7,7 @@ import requests
 
 from util.proxy_manager import randomize_proxy
 from util.request_helper import get_proxies
-from process_request import ProcessRequest
+from state_sos.MS.process_request import ProcessRequest
 from util.helpers import get_data_files, load_range_progress, save_range_progress
 from state_sos.base_scraper import BaseScraper
 
