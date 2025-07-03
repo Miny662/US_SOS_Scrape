@@ -62,7 +62,7 @@ def make_request(
 		total=max_retries,
 		status_forcelist=failed_codes,
 		backoff_factor=backoff_factor,
-		raise_on_status=False
+		raise_on_status=True
 	)
 
 	if not proxies:
@@ -98,6 +98,10 @@ def make_request(
 				proxies=current_proxy
 			)
 
+			# If this was the last attempt, return the response anyway
+			if attempt > max_retries:
+				return response
+
 			if failed_codes and response.status_code in failed_codes:
 				logger.warning(f"Request to {url} returned failure status code {response.status_code}, not retrying.")
 				return response
@@ -113,10 +117,6 @@ def make_request(
 			logger.warning(
 				f"Request to {url} returned status code {response.status_code}, Re-Attempting... {attempt+1}/{max_retries+1}"
 			)
-
-			# If this was the last attempt, return the response anyway
-			if attempt >= max_retries:
-				return response
 
 		except RequestException as e:
 			last_exception = e
