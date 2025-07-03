@@ -1,8 +1,7 @@
 import json
 import logging
-import requests
 from bs4 import BeautifulSoup
-from .helpers import clean_text
+from util.helpers import clean_text
 
 
 class ProcessRequest:

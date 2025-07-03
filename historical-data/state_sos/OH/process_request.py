@@ -5,7 +5,7 @@ import time
 import random
 import requests
 import undetected_chromedriver as uc
-from state_sos.util.proxies import parse_proxy
+from util.proxy_manager import parse_proxy
 
 class ProcessRequest:
     def __init__(self):

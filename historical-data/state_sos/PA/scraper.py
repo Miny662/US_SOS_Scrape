@@ -4,14 +4,13 @@
 import os
 import random
 import time
-import json
 import re
 from urllib.parse import urljoin
 
 import jsonlines
 
-from .process_request import ProcessRequest
-from .helpers import Helpers
+from state_sos.PA.process_request import ProcessRequest
+from state_sos.PA.helpers import Helpers
 from state_sos.base_scraper import BaseScraper
 
 

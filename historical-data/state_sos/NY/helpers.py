@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # coding: utf8
 
-import re
 import os
 import datetime
-from argparse import ArgumentTypeError
 
 
 class Helpers:
