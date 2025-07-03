@@ -18,7 +18,6 @@ class Scraper(BaseScraper):
     def __init__(self, start_id: int = 1, end_id: int = 7800000):
         super().__init__(start_id, end_id)
         self.BASE_URL = "https://corp.sos.ms.gov"
-        # self.PROXY_FILE = "./state_sos/MS/Webshare 1000 proxies - option 1.txt"
         self.OUTPUT_DIR = "Output"
         self.MERGED_FILE = os.path.join(self.OUTPUT_DIR, "merged_data.jsonl")
         os.makedirs(self.OUTPUT_DIR, exist_ok=True)
@@ -126,14 +125,11 @@ class Scraper(BaseScraper):
 
     def run(self):
         """Run the scraper."""
-        # @deprecated
-        # proxies = self.load_proxies(self.PROXY_FILE)
         proxies = get_proxies(service="webshare")
         if len(proxies) < 100:
             logging.error("Not enough proxies loaded. Need at least 100.")
             return
 
-        # selected_proxies = random.sample(proxies, 100)
         selected_proxies = randomize_proxy(proxies, limit=100, single_endpoint=True, shuffle=True)
         logging.info(f"Selected 100 proxies for scraping.")
 
