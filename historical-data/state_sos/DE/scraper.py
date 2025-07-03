@@ -4,7 +4,6 @@
 import os
 import re
 import time
-import json
 import random
 from urllib.parse import urljoin
 
@@ -12,8 +11,9 @@ from bs4 import BeautifulSoup
 import jsonlines
 
 from process_request import ProcessRequest
+# fixme: missing import for SolveRecaptcha
 from solve_recaptcha import SolveRecaptcha
-from helpers import Helpers
+from state_sos.DE.helpers import Helpers
 from state_sos.base_scraper import BaseScraper
 
 

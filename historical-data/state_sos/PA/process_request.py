@@ -5,11 +5,7 @@ import sys
 import time
 
 import requests
-from urllib.request import urlopen
-from urllib.error import HTTPError
-from urllib.error import URLError
-import urllib3
-from state_sos.util.proxies import parse_proxy
+from util.proxy_manager import parse_proxy
 
 
 class ProcessRequest(object):

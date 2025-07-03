@@ -6,7 +6,7 @@ from typing import Any, Dict
 
 import boto3
 from botocore.exceptions import ClientError
-from state_sos.util.config import CONFIG
+from util.config import CONFIG
 
 DEFAULT_REGION = "us-east-1"
 

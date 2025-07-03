@@ -1,9 +1,9 @@
 import datetime
 from typing import Dict, List
 
-from state_sos.util.aws import write_file_to_s3
-from state_sos.util.config import CONFIG
-from state_sos.util.proxies import get_proxies
+from util.aws import write_file_to_s3
+from util.config import CONFIG
+from util.request_helper import get_proxies
 
 
 class BaseScraper:
