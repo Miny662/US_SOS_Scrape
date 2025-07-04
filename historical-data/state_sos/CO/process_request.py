@@ -1,4 +1,4 @@
-import requests
+import cloudscraper
 import time
 from collections import defaultdict
 from threading import Lock
@@ -44,26 +44,29 @@ def fetch_data_for_id(entity_id, proxy_username):
     while retries <= MAX_RETRIES:
         rate_limit_proxy(proxy_username)
         proxies = build_proxy_dict(proxy_username)
-        session = requests.Session()
-        session.proxies.update(proxies)
-        session.headers.update(HEADERS)
+        scraper = cloudscraper.create_scraper()
+        scraper.proxies.update(proxies)
+        scraper.headers.update(HEADERS)
         try:
+            # Main entity page
             entity_url = BASE_URL + "BusinessEntityDetail.do"
             params_entity = {
                 "quitButtonDestination": "BusinessEntityCriteriaExt",
                 "fileId": str(entity_id),
                 "masterFileId": ""
             }
-            resp_entity = session.get(entity_url, params=params_entity, timeout=20)
+            resp_entity = scraper.get(entity_url, params=params_entity, timeout=20)
             if resp_entity.status_code == 429:
                 retry_after = int(resp_entity.headers.get("Retry-After", backoff))
                 print(f"[{proxy_username}] 429 on main page ID {entity_id}, retrying after {retry_after}s")
                 time.sleep(retry_after)
                 retries += 1
-                backoff = min(backoff * 2, 300)
+                backoff = min(backoff * 2, 300)  # exponential backoff capped at 5 minutes
                 continue
             resp_entity.raise_for_status()
             main_data = parse_main_html(resp_entity.text)
+
+            # History and documents page
             history_url = BASE_URL + "BusinessEntityHistory.do"
             params_history = {
                 "quitButtonDestination": "BusinessEntityDetail",
@@ -73,7 +76,7 @@ def fetch_data_for_id(entity_id, proxy_username):
                 "entityId2": "",
                 "srchTyp": ""
             }
-            resp_history = session.get(history_url, params=params_history, timeout=20)
+            resp_history = scraper.get(history_url, params=params_history, timeout=20)
             if resp_history.status_code == 429:
                 retry_after = int(resp_history.headers.get("Retry-After", backoff))
                 print(f"[{proxy_username}] 429 on history page ID {entity_id}, retrying after {retry_after}s")
@@ -83,21 +86,22 @@ def fetch_data_for_id(entity_id, proxy_username):
                 continue
             resp_history.raise_for_status()
             history_data = parse_history_documents(resp_history.text)
+
             main_data["History and Documents"] = history_data
+
             return main_data
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 429:
-                retry_after = int(e.response.headers.get("Retry-After", backoff))
+
+        except Exception as e:
+            # cloudscraper raises requests.exceptions.HTTPError for 4xx/5xx
+            if hasattr(e, 'response') and getattr(e.response, 'status_code', None) == 429:
+                retry_after = int(getattr(e.response, 'headers', {}).get("Retry-After", backoff))
                 print(f"[{proxy_username}] HTTP 429 error ID {entity_id}, retrying after {retry_after}s")
                 time.sleep(retry_after)
                 retries += 1
                 backoff = min(backoff * 2, 300)
                 continue
-            else:
-                print(f"[{proxy_username}] HTTP error fetching ID {entity_id}: {e}")
-                return None
-        except Exception as e:
             print(f"[{proxy_username}] Error fetching ID {entity_id}: {e}")
             return None
+
     print(f"[{proxy_username}] Max retries exceeded for ID {entity_id}")
     return None 

@@ -1,9 +1,11 @@
 import os
 import random
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from process_request import fetch_data_for_id
 from helpers import save_as_jsonl, save_progress, load_progress
 
+# === CONFIGURATION ===
 START_ID = 20250000000
 END_ID = 20250700000
 OUTPUT_DIR = "output"
@@ -12,6 +14,7 @@ JSONL_FILE = os.path.join(OUTPUT_DIR, "CO_business_data.jsonl")
 TOTAL_PROXIES = 1000
 SELECTED_PROXIES = 1000
 MAX_WORKERS = 50
+
 
 def main():
     # Ensure output directory exists
