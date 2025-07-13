@@ -1,4 +1,7 @@
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+print('sys.path:', sys.path)
 import json
 import time
 import logging
@@ -22,29 +25,12 @@ class Scraper(BaseScraper):
         self.MERGED_FILE = os.path.join(self.OUTPUT_DIR, "merged_data.jsonl")
         os.makedirs(self.OUTPUT_DIR, exist_ok=True)
 
-        self.START_ID = 650001
-        self.TOTAL_IDS = 500
+        self.START_ID = 1
+        self.TOTAL_IDS = 1000000
         self.END_ID = self.START_ID + self.TOTAL_IDS - 1
         self.REQUEST_INTERVAL = 1.0
 
         self.process_request = ProcessRequest(self.BASE_URL)
-
-    def load_proxies(self, filename):
-        """Load proxies from file."""
-        proxies = []
-        with open(filename, "r") as f:
-            for line in f:
-                line = line.strip()
-                if not line:
-                    continue
-                parts = line.split(":")
-                if len(parts) != 4:
-                    logging.warning(f"Skipping invalid proxy line: {line}")
-                    continue
-                host, port, user, password = parts
-                proxy_url = f"http://{user}:{password}@{host}:{port}"
-                proxies.append(proxy_url)
-        return proxies
 
     def worker(self, proxy_url, start_id, end_id):
         """Worker function for each proxy thread."""
@@ -125,9 +111,18 @@ class Scraper(BaseScraper):
 
     def run(self):
         """Run the scraper."""
-        proxies = get_proxies(service="webshare")
+        # Generate proxies programmatically as dicts for randomize_proxy
+        proxies = [
+            {
+                "proxyAddress": "p.webshare.io",
+                "port": "80",
+                "username": f"omuhmvei-{i}",
+                "password": "tjynmmev6t7a"
+            }
+            for i in range(1, 1001)
+        ]
         if len(proxies) < 100:
-            logging.error("Not enough proxies loaded. Need at least 100.")
+            logging.error("Not enough proxies generated. Need at least 100.")
             return
 
         selected_proxies = randomize_proxy(proxies, limit=100, single_endpoint=True, shuffle=True)
